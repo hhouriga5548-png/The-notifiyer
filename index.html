@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Terminal</title>
-    <!-- Use a local or trusted, obfuscated script to prevent extension blocking -->
+    <title>System Interface</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #121214; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background: #202024; padding: 30px; border-radius: 8px; width: 100%; max-width: 360px; box-sizing: border-box; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .box { background: #202024; padding: 30px; border-radius: 8px; width: 100%; max-width: 360px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         h2 { margin: 0 0 10px 0; color: #00b37e; font-size: 20px; text-align: center; }
         p { color: #a8a8b3; font-size: 13px; line-height: 1.5; margin-bottom: 20px; text-align: center; }
         .input-group { margin-bottom: 15px; }
@@ -18,32 +17,38 @@
 </head>
 <body>
 
-    <div id="authPortal" class="box">
-        <h2>Member Access</h2>
-        <p>Authorize sync settings.</p>
+    <div id="wrapper" class="box">
+        <h2>System Access</h2>
+        <p>Verify session token.</p>
         <div class="input-group">
-            <input type="email" id="email" placeholder="Email" required>
+            <!-- Renamed ID to avoid adblock triggers -->
+            <input type="text" id="token" placeholder="Enter Code">
         </div>
-        <button onclick="secureSignIn()">Sign In</button>
+        <button onclick="processToken()">Submit</button>
     </div>
 
     <script>
-        // DEFLECTION: Never put Supabase URL/Anon key here.
-        // Direct calls are blocked by adblockers and exposed in network logs.
-        async function secureSignIn() {
-            const email = document.getElementById('email').value;
+        // Use a generic name for the function
+        async function processToken() {
+            const tokenValue = document.getElementById('token').value;
             
-            // Send to a PROXY (like Vercel Function or NoCodeAPI)
-            // This proxy handles the real Supabase key securely
-            const response = await fetch('YOUR_SECURE_PROXY_ENDPOINT', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email })
-            });
-            
-            const result = await response.json();
-            if (result.success) {
-                alert('Check your email for the magic link.');
+            // SECURITY: Call your own serverless function (Vercel/Netlify), NOT Supabase directly.
+            // This hides API keys, enables CORS, and defeats adblockers.
+            const apiEndpoint = '/api/verify'; 
+
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: tokenValue })
+                });
+                
+                const result = await response.json();
+                if(result.success) {
+                    alert('Success');
+                }
+            } catch (error) {
+                console.error('Connection blocked or failed');
             }
         }
     </script>
